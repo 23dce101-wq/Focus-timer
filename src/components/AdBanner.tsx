@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { useEffect } from 'react';
 
 interface AdBannerProps {
   position: 'header' | 'middle' | 'footer' | 'sidebar';
@@ -27,54 +28,41 @@ export function AdBanner({ position, className, format = 'horizontal' }: AdBanne
     sidebar: 'Sidebar Advertisement',
   };
 
+  // Push AdSense after mount for each ad block
+  useEffect(() => {
+    try {
+      // @ts-ignore
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch {}
+  }, []);
+
+  // Map suggested slot sizes per position; replace with real slot IDs
+  const slotByPosition: Record<AdBannerProps['position'], string> = {
+    header: 'YOUR_SLOT_ID_LEADERBOARD',
+    middle: 'YOUR_SLOT_ID_IN_CONTENT',
+    footer: 'YOUR_SLOT_ID_FOOTER',
+    sidebar: 'YOUR_SLOT_ID_SIDEBAR',
+  };
+
   return (
     <div
       className={cn(
-        'relative flex items-center justify-center bg-gradient-to-br from-muted/40 to-muted/20 border-2 border-dashed border-border/50 rounded-xl overflow-hidden backdrop-blur-sm',
+        'relative flex items-center justify-center',
         heights[position],
         widths[format],
-        'hover:border-border/80 transition-all duration-300',
         className
       )}
       aria-label={descriptions[position]}
       role="complementary"
     >
-      {/* Ad placeholder for future AdSense integration */}
-      <div className="text-center space-y-2 p-4">
-        <div className="text-xs font-mono text-muted-foreground/60 uppercase tracking-wide">
-          Advertisement
-        </div>
-        <div className="text-sm text-muted-foreground/80 font-medium">
-          {position === 'header' && 'Leaderboard Ad (728x90)'}
-          {position === 'middle' && 'Banner Ad (468x60)'}
-          {position === 'footer' && 'Leaderboard Ad (728x90)'}
-          {position === 'sidebar' && 'Skyscraper Ad (160x600)'}
-        </div>
-        <div className="text-xs text-muted-foreground/60">
-          Google AdSense Placeholder
-        </div>
-      </div>
-
-      {/* Decorative corners */}
-      <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-border/30 rounded-tl" />
-      <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-border/30 rounded-tr" />
-      <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-border/30 rounded-bl" />
-      <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-border/30 rounded-br" />
-
-      {/* 
-        TODO: Replace with actual AdSense code after approval
-        Example AdSense script:
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-                crossorigin="anonymous"></script>
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-             data-ad-slot="XXXXXXXXXX"
-             data-ad-format="auto"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-      */}
+      <ins
+        className="adsbygoogle"
+        style={{ display: 'block' }}
+        data-ad-client="ca-pub-9807181998947271"
+        data-ad-slot={slotByPosition[position]}
+        data-ad-format={format === 'horizontal' ? 'auto' : format}
+        data-full-width-responsive="true"
+      />
     </div>
   );
 }
