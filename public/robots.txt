@@ -1,0 +1,29 @@
+# https://www.robotstxt.org/robotstxt.html
+# TimerFlow - Online Timer Application
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://timerflow.app/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+# Prevent crawling of admin/auth pages (if any in future)
+User-agent: *
+Disallow: /admin/
+Disallow: /login/
+
+# Crawl-delay (optional - helps prevent server overload)
+Crawl-delay: 1
