@@ -18,19 +18,22 @@ const PORT = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowed = [
-      process.env.FRONTEND_URL || 'http://localhost:5173',
-      'http://localhost:8080',
-    ];
-    if (!origin || allowed.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
-  },
-  credentials: true,
-}));
+
+// CORS configuration
+const allowedOrigins = [
+  'https://myapp.vercel.app',
+  'http://localhost:5173',
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
+// Explicitly handle preflight requests for all routes
+app.options('*', cors({ origin: allowedOrigins, credentials: true }));
 
 // Body parsing middleware
 app.use(express.json());

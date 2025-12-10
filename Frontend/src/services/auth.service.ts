@@ -8,8 +8,7 @@ import {
   PasswordResetRequest,
   PasswordResetConfirm,
 } from '@/types/auth.types';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+import { API_BASE_URL } from '@/config/api';
 
 class AuthService {
   private api: AxiosInstance;
@@ -17,7 +16,7 @@ class AuthService {
 
   constructor() {
     this.api = axios.create({
-      baseURL: API_URL,
+      baseURL: API_BASE_URL,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -75,7 +74,7 @@ class AuthService {
           throw new Error('No refresh token available');
         }
 
-        const response = await axios.post(`${API_URL}/auth/refresh`, {
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
           refreshToken,
         });
 

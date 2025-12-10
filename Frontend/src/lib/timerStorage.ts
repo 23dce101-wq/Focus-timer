@@ -1,10 +1,10 @@
+import { API_BASE_URL } from '@/config/api';
+
 export interface TimerSession {
   mode: 'countdown' | 'pomodoro' | 'stopwatch';
   duration: number; // in seconds
   timestamp: number; // milliseconds since epoch
 }
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 // In-memory cache of sessions loaded from the backend.
 let sessionCache: TimerSession[] = [];
@@ -23,7 +23,7 @@ async function saveTimerSessionToServer(session: TimerSession): Promise<void> {
     const token = getAuthToken();
     if (!token) return;
 
-    await fetch(`${API_URL}/sessions`, {
+    await fetch(`${API_BASE_URL}/sessions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ export async function syncSessionsFromServer(): Promise<void> {
     const token = getAuthToken();
     if (!token) return;
 
-    const response = await fetch(`${API_URL}/sessions`, {
+    const response = await fetch(`${API_BASE_URL}/sessions`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

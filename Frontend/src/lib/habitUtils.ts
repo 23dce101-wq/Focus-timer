@@ -3,6 +3,8 @@
  * Date helpers, streak calculations, and data management
  */
 
+import { API_BASE_URL } from '@/config/api';
+
 /**
  * Format date to YYYY-MM-DD in local timezone (not UTC)
  * This prevents off-by-one errors when converting dates
@@ -162,8 +164,6 @@ export function updateMultipleDays(
   };
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-
 function getAuthToken(): string | null {
   try {
     return localStorage.getItem('accessToken');
@@ -181,7 +181,7 @@ export async function loadHabits(): Promise<Habit[]> {
     const token = getAuthToken();
     if (!token) return [];
 
-    const response = await fetch(`${API_URL}/habits`, {
+    const response = await fetch(`${API_BASE_URL}/habits`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -222,7 +222,7 @@ export async function saveHabits(habits: Habit[]): Promise<void> {
     const token = getAuthToken();
     if (!token) return;
 
-    const response = await fetch(`${API_URL}/habits`, {
+    const response = await fetch(`${API_BASE_URL}/habits`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
