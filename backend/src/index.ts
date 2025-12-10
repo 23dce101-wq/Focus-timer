@@ -18,24 +18,39 @@ const PORT = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
-
 // CORS configuration
 const allowedOrigins = [
-  'https://myapp.vercel.app',
-  'http://localhost:5173',
+  'https://focus-timer-flame.vercel.app', // production frontend
+  'http://localhost:5173',               // local dev
 ];
 
+// Dynamic CORS middleware allowing credentials
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // allow non-browser requests (no Origin header)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error('CORS_NOT_ALLOWED_BY_SERVER'));
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
   })
 );
 
-// Explicitly handle preflight requests for all routes
-app.options('*', cors({ origin: allowedOrigins, credentials: true }));
+// Ensure preflight OPTIONS returns success
+app.options(
+  '*',
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+  })
+);
 
-// Body parsing middleware
+// Body parsing middleware (after CORS)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
