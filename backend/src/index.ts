@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth.routes';
 import sessionRoutes from './routes/session.routes';
 import habitRoutes from './routes/habit.routes';
+import contactRoutes from './routes/contact.routes';
 
 dotenv.config();
 console.log('GOOGLE_CLIENT_ID from env =', process.env.GOOGLE_CLIENT_ID);
@@ -64,6 +65,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/habits', habitRoutes);
+app.use('/api', contactRoutes);
 
 // Error handling
 app.use(errorHandler);
