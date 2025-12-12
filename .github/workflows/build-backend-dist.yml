@@ -41,8 +41,8 @@ jobs:
           mkdir -p /tmp/backend
           cp -R backend/dist /tmp/backend/dist
           cp backend/package.json backend/package-lock.json /tmp/backend/ || true
-          # clear repo except .git
-          git rm -r --ignore-unmatch .
+          # clear repo working tree except .git
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
           # recreate minimal backend structure
           mkdir -p backend
           cp -R /tmp/backend/dist backend/dist
