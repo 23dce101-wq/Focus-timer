@@ -13,6 +13,8 @@ interface TimerState {
   pomodoroCount: number;
   initialTime: number;
   sessionStartTime: number | null;
+  // Total duration (in seconds) already recorded for the current logical session
+  sessionAccumulated: number;
 }
 
 export type { TimerSession };
@@ -47,6 +49,11 @@ function loadTimerState(mode: TimerMode): TimerState | null {
     if (!saved) return null;
     
     const persisted: PersistedTimerState = JSON.parse(saved);
+
+    // Backwards compatibility: older saved states may not have this field
+    if (persisted.sessionAccumulated == null) {
+      persisted.sessionAccumulated = 0;
+    }
     
     // If timer was running, calculate elapsed time since last update
     if (persisted.isRunning && persisted.lastUpdateTime) {
@@ -99,14 +106,18 @@ export function useTimer(initialMode: TimerMode = 'countdown', onComplete?: () =
       return savedState;
     }
     // Return default state if no saved state
+    const isPomodoro = initialMode === 'pomodoro';
+    const defaultTime = isPomodoro ? DEFAULT_POMODORO.workDuration : 0;
+
     return {
-      time: 0,
+      time: defaultTime,
       isRunning: false,
       mode: initialMode,
       pomodoroPhase: 'work',
       pomodoroCount: 0,
-      initialTime: 0,
+      initialTime: defaultTime,
       sessionStartTime: null,
+      sessionAccumulated: 0,
     };
   });
 
@@ -165,26 +176,32 @@ export function useTimer(initialMode: TimerMode = 'countdown', onComplete?: () =
 
   const pause = useCallback(() => {
     setState((prev) => {
+      let newAccumulated = prev.sessionAccumulated ?? 0;
+
       // Save partial session when pausing if there's meaningful progress
       if (prev.sessionStartTime && prev.isRunning) {
-        const timeWorked = prev.mode === 'stopwatch' 
-          ? prev.time 
+        const totalSoFar = prev.mode === 'stopwatch'
+          ? prev.time
           : (prev.initialTime - prev.time);
-        
-        // Only save if at least 1 second of work was done
-        if (timeWorked > 0) {
+
+        const segment = totalSoFar - newAccumulated;
+
+        // Only save if at least 1 second of new work was done
+        if (segment > 0) {
           saveTimerSession({
             mode: prev.mode,
-            duration: timeWorked,
+            duration: segment,
             timestamp: Date.now(),
           });
+          newAccumulated = totalSoFar;
         }
       }
       
       return { 
         ...prev, 
         isRunning: false,
-        sessionStartTime: null // Reset session start on pause
+        sessionStartTime: null, // Reset session start on pause
+        sessionAccumulated: newAccumulated,
       };
     });
   }, []);
@@ -194,14 +211,16 @@ export function useTimer(initialMode: TimerMode = 'countdown', onComplete?: () =
     setState((prev) => {
       // Save session on reset if there was meaningful work done
       if (prev.sessionStartTime) {
-        const timeWorked = prev.mode === 'stopwatch' 
-          ? prev.time 
+        const totalSoFar = prev.mode === 'stopwatch'
+          ? prev.time
           : (prev.initialTime - prev.time);
-        
-        if (timeWorked > 0) {
+
+        const segment = totalSoFar - (prev.sessionAccumulated ?? 0);
+
+        if (segment > 0) {
           saveTimerSession({
             mode: prev.mode,
-            duration: timeWorked,
+            duration: segment,
             timestamp: Date.now(),
           });
         }
@@ -212,6 +231,7 @@ export function useTimer(initialMode: TimerMode = 'countdown', onComplete?: () =
         time: prev.mode === 'stopwatch' ? 0 : prev.initialTime,
         isRunning: false,
         sessionStartTime: null,
+        sessionAccumulated: 0,
       };
     });
   }, [clearTimer]);
@@ -239,6 +259,7 @@ export function useTimer(initialMode: TimerMode = 'countdown', onComplete?: () =
       pomodoroCount: 0,
       initialTime: newTime,
       sessionStartTime: null,
+      sessionAccumulated: 0,
     });
   }, [clearTimer, pomodoroSettings.workDuration]);
 
@@ -293,12 +314,16 @@ export function useTimer(initialMode: TimerMode = 'countdown', onComplete?: () =
 
             // Save session if we have a start time
             if (prev.sessionStartTime) {
-              // For countdown/pomodoro, use initial time; for stopwatch, use current time
-              const duration = prev.mode === 'stopwatch' ? prev.time : prev.initialTime;
-              if (duration > 0) {
+              const totalSoFar = prev.mode === 'stopwatch'
+                ? prev.time
+                : (prev.initialTime - prev.time);
+
+              const segment = totalSoFar - (prev.sessionAccumulated ?? 0);
+
+              if (segment > 0) {
                 saveTimerSession({
                   mode: prev.mode,
-                  duration: duration,
+                  duration: segment,
                   timestamp: Date.now(),
                 });
               }
@@ -316,12 +341,12 @@ export function useTimer(initialMode: TimerMode = 'countdown', onComplete?: () =
               setTimeout(() => {
                 nextPomodoroPhase();
               }, 100);
-              return { ...prev, time: 0, isRunning: false, sessionStartTime: null };
+              return { ...prev, time: 0, isRunning: false, sessionStartTime: null, sessionAccumulated: 0 };
             }
 
             // Regular countdown timer
             playSound();
-            return { ...prev, time: 0, isRunning: false, sessionStartTime: null };
+            return { ...prev, time: 0, isRunning: false, sessionStartTime: null, sessionAccumulated: 0 };
           }
 
           return { ...prev, time: prev.time - 1 };
