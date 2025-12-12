@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Timer, Moon, Sun, Monitor, User, LogOut, Settings } from 'lucide-react';
+import { Timer, Moon, Sun, Monitor, LogOut, Settings, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -22,6 +23,7 @@ interface HeaderProps {
 export function Header({ theme, onThemeChange }: HeaderProps) {
   const ThemeIcon = theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor;
   const { user, isAuthenticated, logout } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const getInitials = (name?: string | null) => {
     if (!name || typeof name !== 'string') {
@@ -149,13 +151,78 @@ export function Header({ theme, onThemeChange }: HeaderProps) {
               <Button asChild variant="ghost" size="sm">
                 <Link to="/login">Sign In</Link>
               </Button>
-              <Button asChild size="sm" className="hidden sm:inline-flex">
+              <Button asChild size="sm" className="inline-flex">
                 <Link to="/signup">Sign Up</Link>
               </Button>
             </div>
           )}
+
+          {/* Mobile navigation toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="nav-icon-bubble rounded-full hover:scale-110 transition-transform duration-300 md:hidden"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <span className="sr-only">Toggle navigation</span>
+          </Button>
         </div>
       </div>
+
+      {/* Mobile nav menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+          <div className="container mx-auto px-3 py-3 space-y-1.5">
+            <Link
+              to="/"
+              className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Timer
+            </Link>
+            <Link
+              to="/habits"
+              className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Habits
+            </Link>
+            <Link
+              to="/about"
+              className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            <a
+              href="/#how-to-use"
+              className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              How to Use
+            </a>
+            <Link
+              to="/contact"
+              className="flex items-center rounded-lg px-3 py-2 text-sm font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+
+            {!isAuthenticated && (
+              <div className="mt-2 flex gap-2">
+                <Button asChild variant="ghost" size="sm" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/login">Sign In</Link>
+                </Button>
+                <Button asChild size="sm" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }
