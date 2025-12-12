@@ -1,0 +1,58 @@
+name: Build backend and publish dist
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Build backend (install devDeps)
+        working-directory: backend
+        run: |
+          NPM_CONFIG_PRODUCTION=false npm ci
+          npm run build
+
+      - name: Prepare deployment branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan dist-backend
+
+      - name: Copy built files to branch
+        run: |
+          # copy built backend artifacts to a temporary location
+          mkdir -p /tmp/backend
+          cp -R backend/dist /tmp/backend/dist
+          cp backend/package.json backend/package-lock.json /tmp/backend/ || true
+          # clear repo except .git
+          git rm -r --ignore-unmatch .
+          # recreate minimal backend structure
+          mkdir -p backend
+          cp -R /tmp/backend/dist backend/dist
+          cp /tmp/backend/package.json /tmp/backend/package-lock.json backend/ || true
+          # commit
+          git add -A
+          git commit -m "ci: publish compiled backend dist [ci skip]" || echo "Nothing to commit"
+
+      - name: Push dist branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push --force origin dist-backend

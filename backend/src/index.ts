@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -15,7 +15,7 @@ console.log('GOOGLE_CLIENT_ID from env =', process.env.GOOGLE_CLIENT_ID);
 
 
 const app: Application = express();
-const PORT = process.env.PORT || 3001;
+const PORT = Number(process.env.PORT) || 4000;
 
 // Security middleware
 app.use(helmet());
@@ -28,7 +28,7 @@ const allowedOrigins = [
 // Dynamic CORS middleware allowing credentials
 app.use(
   cors({
-    origin: (origin, callback) => {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // allow non-browser requests (no Origin header)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
@@ -57,7 +57,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/api/health', (req: Request, res: Response, _next: NextFunction) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
