@@ -242,6 +242,8 @@ export function useTimer(initialMode: TimerMode = 'countdown', onComplete?: () =
       time: seconds,
       initialTime: seconds,
       isRunning: false,
+      sessionStartTime: null,
+      sessionAccumulated: 0,
     }));
   }, []);
 
@@ -314,11 +316,17 @@ export function useTimer(initialMode: TimerMode = 'countdown', onComplete?: () =
 
             // Save session if we have a start time
             if (prev.sessionStartTime) {
-              const totalSoFar = prev.mode === 'stopwatch'
-                ? prev.time
-                : (prev.initialTime - prev.time);
+              let segment = 0;
 
-              const segment = totalSoFar - (prev.sessionAccumulated ?? 0);
+              if (prev.mode === 'stopwatch') {
+                const totalSoFar = prev.time;
+                segment = totalSoFar - (prev.sessionAccumulated ?? 0);
+              } else {
+                // For countdown/pomodoro, a completed session should count the full
+                // configured duration, regardless of the internal tick timing.
+                const totalDuration = prev.initialTime;
+                segment = totalDuration - (prev.sessionAccumulated ?? 0);
+              }
 
               if (segment > 0) {
                 saveTimerSession({
