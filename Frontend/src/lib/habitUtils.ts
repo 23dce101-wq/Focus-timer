@@ -181,6 +181,8 @@ export async function loadHabits(): Promise<Habit[]> {
     const token = getAuthToken();
     if (!token) return [];
 
+    console.info('Loading habits from API...', { baseUrl: API_BASE_URL });
+
     const response = await fetch(`${API_BASE_URL}/habits`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -201,11 +203,28 @@ export async function loadHabits(): Promise<Habit[]> {
         window.location.href = '/login';
       }
       console.error('Failed to load habits from server:', await response.text());
-      return [];
+      // Surface the error to callers so they can show a proper
+      // error state instead of silently rendering empty charts.
+      throw new Error(`Failed to load habits: ${response.status}`);
     }
 
-    const data = (await response.json()) as { habits?: Habit[] };
-    const habits = data.habits ?? [];
+    const data = (await response.json()) as { habits?: any[] };
+    const habitsRaw = data.habits ?? [];
+
+    // Normalise id field to always be present for the UI
+    const habits: Habit[] = habitsRaw.map((h, index) => ({
+      id:
+        (h as any).id ||
+        (h as any).habitId ||
+        `habit_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 6)}`,
+      name: h.name,
+      icon: h.icon,
+      category: h.category,
+      dailyTarget: h.dailyTarget,
+      reminderEnabled: Boolean(h.reminderEnabled),
+      createdAt: h.createdAt || new Date().toISOString(),
+      days: Array.isArray(h.days) ? h.days : [],
+    }));
 
     // Ensure all habits have an up-to-date 30-day window
     return habits.map((habit) => {
@@ -221,7 +240,8 @@ export async function loadHabits(): Promise<Habit[]> {
     });
   } catch (error) {
     console.error('Error loading habits from server:', error);
-    return [];
+    // Re-throw so the UI layer can decide how to present the error.
+    throw error;
   }
 }
 

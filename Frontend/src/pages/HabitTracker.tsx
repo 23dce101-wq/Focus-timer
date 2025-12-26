@@ -33,6 +33,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import confetti from 'canvas-confetti';
+import { AnalyticsErrorBoundary } from '@/components/AnalyticsErrorBoundary';
 
 export function HabitTracker() {
   const { theme, setTheme } = useTheme();
@@ -42,6 +43,8 @@ export function HabitTracker() {
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const { toast } = useToast();
   
   const handleMonthChange = (year: number, month: number) => {
@@ -51,10 +54,24 @@ export function HabitTracker() {
   // Load habits on mount from backend
   useEffect(() => {
     const fetchHabits = async () => {
-      const loaded = await loadHabits();
-      setHabits(loaded);
-      if (loaded.length > 0) {
-        setSelectedHabit(loaded[0]);
+      try {
+        setIsLoading(true);
+        setLoadError(null);
+        const loaded = await loadHabits();
+        setHabits(loaded);
+        if (loaded.length > 0) {
+          setSelectedHabit(loaded[0]);
+        }
+      } catch (error) {
+        console.error('Failed to load habits in HabitTracker:', error);
+        setLoadError('Failed to load habits from the server. Please try again.');
+        toast({
+          title: 'Unable to load habits',
+          description: 'There was a problem contacting the server. Check your connection and try again.',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -248,8 +265,8 @@ export function HabitTracker() {
       <div className="min-h-screen flex flex-col pb-24 md:pb-28">
         <div className="floating-gradient" />
         
-        <main className="flex-1 py-8 md:py-12">
-          <div className="container mx-auto px-4 space-y-8">
+        <main className="flex-1 py-4 md:py-6">
+          <div className="container mx-auto px-4 space-y-4">
             {/* Header */}
             <motion.div 
               initial={{ opacity: 0, y: -20 }}
@@ -288,6 +305,19 @@ export function HabitTracker() {
                 </Button>
               </motion.div>
             </motion.div>
+
+            {/* Loading and error states for backend habit data */}
+            {isLoading && (
+              <div className="timer-card p-4 text-center text-muted-foreground">
+                Loading your habits and analytics...
+              </div>
+            )}
+
+            {!isLoading && loadError && (
+              <div className="timer-card p-4 text-center text-destructive">
+                {loadError}
+              </div>
+            )}
           
           {/* Stats Overview */}
           {habits.length > 0 && (
@@ -354,19 +384,20 @@ export function HabitTracker() {
               </Button>
             </motion.div>
           ) : (
-            <motion.div 
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-            >
-              {/* Left Column - Habit Cards */}
-              <motion.div variants={staggerItem} className="lg:col-span-2 space-y-6">
+            <AnalyticsErrorBoundary>
+              <motion.div 
+                variants={staggerContainer}
+                initial="hidden"
+                animate="visible"
+                className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              
+                {/* Left Column - Habit Cards */}
+                <motion.div variants={staggerItem} className="lg:col-span-2 space-y-4">
                 {/* Habit Selection Tabs */}
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
-                  {habits.map((habit) => (
+                  {habits.map((habit, index) => (
                     <button
-                      key={habit.id}
+                      key={habit.id || `${habit.name}-${index}`}
                       onClick={() => setSelectedHabit(habit)}
                       className={`
                         flex items-center gap-2 px-4 py-2 rounded-lg border-2 
@@ -385,7 +416,7 @@ export function HabitTracker() {
                 
                 {/* Selected Habit Detail */}
                 {selectedHabit && (
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     <HabitCard
                       habit={selectedHabit}
                       onEdit={handleEditHabit}
@@ -402,13 +433,14 @@ export function HabitTracker() {
                     </div>
                   </div>
                 )}
+                </motion.div>
+                
+                {/* Right Column - Charts */}
+                <motion.div variants={staggerItem} className="lg:col-span-1">
+                  <ChartsPanel habits={habits} onMonthChange={handleMonthChange} />
+                </motion.div>
               </motion.div>
-              
-              {/* Right Column - Charts */}
-              <motion.div variants={staggerItem} className="lg:col-span-1">
-                <ChartsPanel habits={habits} onMonthChange={handleMonthChange} />
-              </motion.div>
-            </motion.div>
+            </AnalyticsErrorBoundary>
           )}
         </div>
       </main>

@@ -11,19 +11,45 @@ import habitRoutes from './routes/habit.routes';
 import contactRoutes from './routes/contact.routes';
 
 dotenv.config();
-console.log('GOOGLE_CLIENT_ID from env =', process.env.GOOGLE_CLIENT_ID);
+// console.log('GOOGLE_CLIENT_ID from env =', process.env.GOOGLE_CLIENT_ID);
 
 
 const app: Application = express();
 const PORT = Number(process.env.PORT) || 4000;
 
 // Security middleware
-app.use(helmet());
+// Configure Helmet so that COOP/COEP do not break OAuth popups,
+// workers, or postMessage-based features in development or production.
+// We explicitly disable crossOriginEmbedderPolicy and relax
+// crossOriginOpenerPolicy to allow popups while keeping a sane default.
+const isProduction = process.env.NODE_ENV === 'production';
+
+app.use(
+  helmet({
+    // Disable COEP so that third-party scripts, workers, and iframes
+    // (e.g. Google OAuth, analytics, canvas workers) are not blocked.
+    crossOriginEmbedderPolicy: false,
+    // Allow opening cross-origin windows (OAuth flows, etc.) while
+    // still using a safe default policy in production.
+    crossOriginOpenerPolicy: isProduction
+      ? { policy: 'same-origin-allow-popups' }
+      : { policy: 'unsafe-none' },
+  })
+);
 // CORS configuration
-const allowedOrigins = [
-  'https://focus-timer-flame.vercel.app', // production frontend
-  'http://localhost:5173',               // local dev
+// Allow localhost by default and optionally one or more frontend URLs from env
+const defaultAllowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:8080',
+  'https://focus-timer-flame.vercel.app',
 ];
+
+const envOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+const allowedOrigins = Array.from(new Set([...defaultAllowedOrigins, ...envOrigins]));
 
 // Dynamic CORS middleware allowing credentials
 app.use(

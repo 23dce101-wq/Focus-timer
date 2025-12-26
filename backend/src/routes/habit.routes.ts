@@ -8,7 +8,9 @@ const router = Router();
 router.get('/', requireAuth, async (req, res) => {
   try {
     const userId = (req as any).userId as string;
-    const habits = await Habit.find({ userId }).sort({ createdAt: 1 }).lean();
+    // Do not use .lean() so the Habit schema's toJSON transform runs
+    const docs = await Habit.find({ userId }).sort({ createdAt: 1 });
+    const habits = docs.map((doc) => doc.toJSON());
     return res.json({ habits });
   } catch (error) {
     console.error('Failed to load habits:', error);
