@@ -19,6 +19,8 @@ import { AdBanner } from '@/components/AdBanner';
 import { BottomNavbar } from '@/components/layout/BottomNavbar';
 import { Footer } from '@/components/layout/Footer';
 import { PageTransition, staggerContainer, staggerItem } from '@/components/layout/PageTransition';
+import { KeyboardShortcutsDialog } from '@/components/KeyboardShortcutsDialog';
+import { SoundSelector } from '@/components/SoundSelector';
 import { Clock, Timer, Watch, Sparkles } from 'lucide-react';
 
 const TimerPage = () => {
@@ -213,6 +215,12 @@ const TimerPage = () => {
                         <TimeInput onSet={countdownTimer.setTime} />
                         <PresetButtons onSelect={countdownTimer.setTime} activeTime={countdownTimer.time} />
                       </div>
+                      
+                      {/* Quick Actions */}
+                      <div className="flex items-center justify-center gap-3 pt-4 border-t border-border/50">
+                        <KeyboardShortcutsDialog />
+                        <SoundSelector />
+                      </div>
                     </TabsContent>
 
                     <TabsContent value="pomodoro" className="space-y-8">
@@ -233,6 +241,12 @@ const TimerPage = () => {
                         onReset={pomodoroTimer.reset}
                         onFullscreen={toggleFocusMode}
                       />
+                      
+                      {/* Quick Actions */}
+                      <div className="flex items-center justify-center gap-3 pt-4 border-t border-border/50">
+                        <KeyboardShortcutsDialog />
+                        <SoundSelector />
+                      </div>
                     </TabsContent>
 
                     <TabsContent value="stopwatch" className="space-y-6 md:space-y-8 mt-6 md:mt-10">
@@ -249,6 +263,12 @@ const TimerPage = () => {
                         onReset={stopwatchTimer.reset}
                         onFullscreen={toggleFocusMode}
                       />
+                      
+                      {/* Quick Actions */}
+                      <div className="flex items-center justify-center gap-3 pt-4 border-t border-border/50">
+                        <KeyboardShortcutsDialog />
+                        <SoundSelector />
+                      </div>
                     </TabsContent>
                   </Tabs>
                 </div>
