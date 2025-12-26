@@ -1,41 +1,66 @@
-import { Header } from '@/components/layout/Header';
+import { motion } from 'framer-motion';
 import { Footer } from '@/components/layout/Footer';
+import { BottomNavbar } from '@/components/layout/BottomNavbar';
+import { PageTransition, staggerContainer, staggerItem } from '@/components/layout/PageTransition';
 import { useTheme } from '@/hooks/useTheme';
-import { Mail } from 'lucide-react';
+import { Mail, Sparkles } from 'lucide-react';
 import { ContactForm } from '@/components/ContactForm';
 
 export default function Contact() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header theme={theme} onThemeChange={setTheme} />
+    <PageTransition>
+      <div className="min-h-screen flex flex-col pb-24 md:pb-28">
+        <div className="floating-gradient" />
 
-      <main className="flex-1">
-        <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <div className="mb-8 flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent">
-              <Mail className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-display font-bold">Contact Us</h1>
-              <p className="text-muted-foreground mt-1">We'd love to hear from you</p>
-            </div>
-          </div>
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-12 max-w-4xl">
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-8 text-center md:text-left"
+            >
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4"
+              >
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Get in Touch</span>
+              </motion.div>
+              
+              <div className="flex flex-col md:flex-row items-center gap-4 justify-center md:justify-start">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent">
+                  <Mail className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-display font-bold">Contact <span className="gradient-text">Us</span></h1>
+                  <p className="text-muted-foreground mt-1">We'd love to hear from you</p>
+                </div>
+              </div>
+            </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Contact Form */}
-            <div className="glass-card p-6 rounded-xl">
-              <h2 className="text-2xl font-bold mb-4">Send us a Message</h2>
-              <p className="text-muted-foreground mb-6">
-                Have a question, suggestion, or feedback? Fill out the form below and we'll get back to you as soon as possible.
-              </p>
+            <motion.div 
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="grid md:grid-cols-2 gap-8"
+            >
+              {/* Contact Form */}
+              <motion.div variants={staggerItem} className="glass-card p-6 rounded-xl">
+                <h2 className="text-2xl font-bold mb-4">Send us a Message</h2>
+                <p className="text-muted-foreground mb-6">
+                  Have a question, suggestion, or feedback? Fill out the form below and we'll get back to you as soon as possible.
+                </p>
 
-              <ContactForm />
-            </div>
+                <ContactForm />
+              </motion.div>
 
-            {/* Contact Information */}
-            <div className="space-y-6">
+              {/* Contact Information */}
+              <motion.div variants={staggerItem} className="space-y-6">
               <div className="glass-card p-6 rounded-xl">
                 <h2 className="text-2xl font-bold mb-4">Get in Touch</h2>
                 <div className="space-y-4">
@@ -98,39 +123,48 @@ export default function Contact() {
                   We love hearing your ideas! Share your feature requests and help us make TimerFlow even better.
                 </p>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Additional Information */}
-          <div className="mt-12 grid md:grid-cols-3 gap-6">
-            <div className="text-center p-6 bg-muted/50 rounded-xl">
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="mt-12 grid md:grid-cols-3 gap-6"
+          >
+            <motion.div variants={staggerItem} className="text-center p-6 bg-muted/50 rounded-xl">
               <div className="text-3xl mb-3">💡</div>
               <h3 className="font-semibold mb-2">Suggestions</h3>
               <p className="text-sm text-muted-foreground">
                 Have ideas for new features or improvements?
               </p>
-            </div>
+            </motion.div>
 
-            <div className="text-center p-6 bg-muted/50 rounded-xl">
+            <motion.div variants={staggerItem} className="text-center p-6 bg-muted/50 rounded-xl">
               <div className="text-3xl mb-3">🐛</div>
               <h3 className="font-semibold mb-2">Bug Reports</h3>
               <p className="text-sm text-muted-foreground">
                 Found a problem? Let us know so we can fix it!
               </p>
-            </div>
+            </motion.div>
 
-            <div className="text-center p-6 bg-muted/50 rounded-xl">
+            <motion.div variants={staggerItem} className="text-center p-6 bg-muted/50 rounded-xl">
               <div className="text-3xl mb-3">🤝</div>
               <h3 className="font-semibold mb-2">Partnerships</h3>
               <p className="text-sm text-muted-foreground">
                 Interested in collaborating or advertising?
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </main>
 
       <Footer />
+      
+      {/* Bottom Navigation */}
+      <BottomNavbar />
     </div>
+    </PageTransition>
   );
 }

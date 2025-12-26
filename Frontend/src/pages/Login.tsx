@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Mail, Lock, AlertCircle } from 'lucide-react';
+import { BottomNavbar } from '@/components/layout/BottomNavbar';
+import { PageTransition } from '@/components/layout/PageTransition';
+import { Loader2, Mail, Lock, AlertCircle, Timer } from 'lucide-react';
 import { GoogleLogin } from './GoogleLogin';
 
 export function Login() {
@@ -81,14 +84,39 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background to-muted">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
-          <CardDescription className="text-center">
-            Sign in to your TimerFlow account
-          </CardDescription>
-        </CardHeader>
+    <PageTransition>
+      <div className="min-h-screen flex flex-col pb-24 md:pb-28">
+        <div className="floating-gradient" />
+        
+        <div className="flex-1 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-md"
+          >
+            {/* Logo */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex justify-center mb-8"
+            >
+              <Link to="/" className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg">
+                  <Timer className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <span className="font-display text-2xl font-bold gradient-text">TimerFlow</span>
+              </Link>
+            </motion.div>
+
+            <Card className="backdrop-blur-xl bg-card/80 border-border/50">
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl font-bold text-center">Welcome Back</CardTitle>
+                <CardDescription className="text-center">
+                  Sign in to your TimerFlow account
+                </CardDescription>
+              </CardHeader>
         <CardContent className="space-y-4">
           {error && (
             <Alert variant="destructive">
@@ -178,15 +206,21 @@ export function Login() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          <p className="text-sm text-center text-muted-foreground">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-primary hover:underline font-medium">
-              Sign up
-            </Link>
-          </p>
-        </CardFooter>
-      </Card>
-    </div>
+          <CardFooter className="flex flex-col space-y-2">
+            <p className="text-sm text-center text-muted-foreground">
+              Don't have an account?{' '}
+              <Link to="/signup" className="text-primary hover:underline font-medium">
+                Sign up
+              </Link>
+            </p>
+          </CardFooter>
+        </Card>
+          </motion.div>
+        </div>
+        
+        {/* Bottom Navigation */}
+        <BottomNavbar />
+      </div>
+    </PageTransition>
   );
 }

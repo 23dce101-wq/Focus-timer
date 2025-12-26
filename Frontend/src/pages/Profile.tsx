@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { BottomNavbar } from '@/components/layout/BottomNavbar';
+import { PageTransition, staggerContainer, staggerItem } from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useTheme } from '@/hooks/useTheme';
-import { User, Mail, Lock, Loader2, AlertCircle, CheckCircle, LogOut } from 'lucide-react';
+import { User, Mail, Lock, Loader2, AlertCircle, CheckCircle, LogOut, Sparkles } from 'lucide-react';
 import { authService } from '@/services/auth.service';
 
 export function Profile() {
@@ -104,35 +106,57 @@ export function Profile() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header theme={theme} onThemeChange={setTheme} />
+    <PageTransition>
+      <div className="min-h-screen flex flex-col pb-24 md:pb-28">
+        <div className="floating-gradient" />
 
-      <main className="flex-1 py-12">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Profile Settings</h1>
-            <p className="text-muted-foreground">Manage your account settings and preferences</p>
-          </div>
+        <main className="flex-1 py-12">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-8 text-center md:text-left"
+            >
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4"
+              >
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Your Account</span>
+              </motion.div>
+              
+              <h1 className="text-3xl font-bold mb-2">Profile <span className="gradient-text">Settings</span></h1>
+              <p className="text-muted-foreground">Manage your account settings and preferences</p>
+            </motion.div>
 
-          {error && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+            {error && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-          {success && (
-            <Alert className="mb-6 border-green-500 bg-green-50 dark:bg-green-950">
-              <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <AlertDescription className="text-green-600 dark:text-green-400">
-                {success}
-              </AlertDescription>
-            </Alert>
-          )}
+            {success && (
+              <Alert className="mb-6 border-green-500 bg-green-50 dark:bg-green-950">
+                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <AlertDescription className="text-green-600 dark:text-green-400">
+                  {success}
+                </AlertDescription>
+              </Alert>
+            )}
 
-          <div className="grid gap-6">
-            {/* Profile Card */}
-            <Card>
+            <motion.div 
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="grid gap-6"
+            >
+              {/* Profile Card */}
+              <motion.div variants={staggerItem}>
+                <Card className="backdrop-blur-xl bg-card/80 border-border/50">
               <CardHeader>
                 <div className="flex items-center gap-4">
                   <Avatar className="h-16 w-16">
@@ -151,9 +175,11 @@ export function Profile() {
                 </div>
               </CardHeader>
             </Card>
+              </motion.div>
 
             {/* Settings Tabs */}
-            <Card>
+            <motion.div variants={staggerItem}>
+              <Card className="backdrop-blur-xl bg-card/80 border-border/50">
               <Tabs defaultValue="profile" className="w-full">
                 <CardHeader>
                   <TabsList className="grid w-full grid-cols-2">
@@ -300,9 +326,11 @@ export function Profile() {
                 </CardContent>
               </Tabs>
             </Card>
+              </motion.div>
 
             {/* Danger Zone */}
-            <Card className="border-destructive">
+            <motion.div variants={staggerItem}>
+              <Card className="border-destructive backdrop-blur-xl bg-card/80">
               <CardHeader>
                 <CardTitle className="text-destructive">Danger Zone</CardTitle>
                 <CardDescription>Irreversible actions</CardDescription>
@@ -321,11 +349,16 @@ export function Profile() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+              </motion.div>
+          </motion.div>
         </div>
       </main>
 
       <Footer />
+      
+      {/* Bottom Navigation */}
+      <BottomNavbar />
     </div>
+    </PageTransition>
   );
 }

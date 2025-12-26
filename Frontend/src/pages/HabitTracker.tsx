@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Plus, Award, Target } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Plus, Award, Target, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/hooks/useTheme';
-import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { BottomNavbar } from '@/components/layout/BottomNavbar';
+import { PageTransition, staggerContainer, staggerItem } from '@/components/layout/PageTransition';
 import type { Habit } from '@/lib/habitUtils';
 import {
   loadHabits,
@@ -242,35 +244,60 @@ export function HabitTracker() {
   );
   
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="floating-gradient" />
-      <Header theme={theme} onThemeChange={setTheme} />
-      
-      <main className="flex-1 py-8 md:py-12">
-        <div className="container mx-auto px-4 space-y-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
-                Habit <span className="gradient-text">Tracker</span>
-              </h1>
-              <p className="text-muted-foreground">
-                Build better habits, one day at a time
-              </p>
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={() => setIsAddModalOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Habit
-              </Button>
-            </div>
-          </div>
+    <PageTransition>
+      <div className="min-h-screen flex flex-col pb-24 md:pb-28">
+        <div className="floating-gradient" />
+        
+        <main className="flex-1 py-8 md:py-12">
+          <div className="container mx-auto px-4 space-y-8">
+            {/* Header */}
+            <motion.div 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+            >
+              <div className="text-center md:text-left">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4"
+                >
+                  <Sparkles className="h-4 w-4 text-accent" />
+                  <span className="text-sm font-medium text-accent">Build Better Habits</span>
+                </motion.div>
+                
+                <h1 className="text-3xl md:text-4xl font-display font-bold mb-2">
+                  Habit <span className="gradient-text">Tracker</span>
+                </h1>
+                <p className="text-muted-foreground">
+                  Build better habits, one day at a time
+                </p>
+              </div>
+              
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-wrap gap-2 justify-center md:justify-end"
+              >
+                <Button onClick={() => setIsAddModalOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Habit
+                </Button>
+              </motion.div>
+            </motion.div>
           
           {/* Stats Overview */}
           {habits.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="timer-card p-4">
+            <motion.div 
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+            >
+              <motion.div variants={staggerItem} className="timer-card p-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                     <Target className="h-5 w-5 text-white" />
@@ -280,9 +307,9 @@ export function HabitTracker() {
                     <p className="text-xs text-muted-foreground">Active Habits</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               
-              <div className="timer-card p-4">
+              <motion.div variants={staggerItem} className="timer-card p-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
                     <Award className="h-5 w-5 text-white" />
@@ -292,9 +319,9 @@ export function HabitTracker() {
                     <p className="text-xs text-muted-foreground">Days Completed</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
               
-              <div className="timer-card p-4">
+              <motion.div variants={staggerItem} className="timer-card p-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
                     <span className="text-xl">🔥</span>
@@ -304,13 +331,18 @@ export function HabitTracker() {
                     <p className="text-xs text-muted-foreground">Total Streaks</p>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           )}
           
           {habits.length === 0 ? (
             /* Empty State */
-            <div className="timer-card p-12 text-center">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className="timer-card p-12 text-center"
+            >
               <div className="text-6xl mb-4">🎯</div>
               <h2 className="text-2xl font-semibold mb-2">No habits yet</h2>
               <p className="text-muted-foreground mb-6">
@@ -320,11 +352,16 @@ export function HabitTracker() {
                 <Plus className="h-5 w-5 mr-2" />
                 Create Your First Habit
               </Button>
-            </div>
+            </motion.div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <motion.div 
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            >
               {/* Left Column - Habit Cards */}
-              <div className="lg:col-span-2 space-y-6">
+              <motion.div variants={staggerItem} className="lg:col-span-2 space-y-6">
                 {/* Habit Selection Tabs */}
                 <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
                   {habits.map((habit) => (
@@ -365,13 +402,13 @@ export function HabitTracker() {
                     </div>
                   </div>
                 )}
-              </div>
+              </motion.div>
               
               {/* Right Column - Charts */}
-              <div className="lg:col-span-1">
+              <motion.div variants={staggerItem} className="lg:col-span-1">
                 <ChartsPanel habits={habits} onMonthChange={handleMonthChange} />
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           )}
         </div>
       </main>
@@ -412,6 +449,10 @@ export function HabitTracker() {
       </AlertDialog>
       
       <Footer />
+      
+      {/* Bottom Navigation */}
+      <BottomNavbar />
     </div>
+    </PageTransition>
   );
 }

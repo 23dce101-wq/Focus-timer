@@ -489,3 +489,298 @@
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
+
+/* ==========================================
+   Premium Bottom Navigation Bar Styles
+   ========================================== */
+
+.bottom-navbar {
+  pointer-events: auto;
+}
+
+.bottom-navbar-glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .bottom-navbar-glass {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.bottom-navbar-glass:hover {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    0 6px 20px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.dark .bottom-navbar-glass:hover {
+  background: rgba(15, 23, 42, 0.9);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 6px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.bottom-nav-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.bottom-nav-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(22, 189, 202, 0.1), 
+    rgba(16, 185, 129, 0.1)
+  );
+  border-radius: 12px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-nav-item:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ==========================================
+   Hero Section Premium Styles
+   ========================================== */
+
+.hero-feature-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-feature-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(22, 189, 202, 0.03),
+    rgba(16, 185, 129, 0.03)
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.hero-feature-card:hover::before {
+  opacity: 1;
+}
+
+.hero-feature-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%) rotate(45deg);
+  transition: transform 0.8s ease;
+}
+
+.hero-feature-card:hover::after {
+  transform: translateX(100%) rotate(45deg);
+}
+
+.hero-cta-primary {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-cta-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hero-cta-primary:hover::before {
+  opacity: 1;
+}
+
+.hero-cta-primary > * {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-cta-secondary {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-cta-secondary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(22, 189, 202, 0.05), 
+    rgba(16, 185, 129, 0.05)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.hero-cta-secondary:hover::before {
+  opacity: 1;
+}
+
+/* ==========================================
+   Page Transition Styles
+   ========================================== */
+
+.page-transition-wrapper {
+  will-change: transform, opacity;
+}
+
+/* Ensure footer doesn't get cut off */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* ==========================================
+   Focus Mode Styles - Premium UI
+   ========================================== */
+
+.focus-mode-overlay {
+  overflow: hidden;
+  user-select: none;
+}
+
+.focus-mode-gradient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 70%);
+}
+
+.focus-mode-gradient::before,
+.focus-mode-gradient::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.3;
+  animation: focusFloat 30s ease-in-out infinite;
+}
+
+.focus-mode-gradient::before {
+  width: 50vw;
+  height: 50vw;
+  max-width: 600px;
+  max-height: 600px;
+  background: hsl(var(--primary) / 0.4);
+  top: -10%;
+  left: -10%;
+}
+
+.focus-mode-gradient::after {
+  width: 40vw;
+  height: 40vw;
+  max-width: 500px;
+  max-height: 500px;
+  background: hsl(var(--accent) / 0.4);
+  bottom: -10%;
+  right: -10%;
+  animation-delay: -15s;
+}
+
+@keyframes focusFloat {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(5%, 5%) scale(1.05);
+  }
+  50% {
+    transform: translate(0, 10%) scale(1);
+  }
+  75% {
+    transform: translate(-5%, 5%) scale(0.95);
+  }
+}
+
+.focus-mode-ring {
+  filter: drop-shadow(0 0 20px hsl(var(--primary) / 0.25));
+  transition: filter 0.3s ease;
+}
+
+.focus-mode-ring:hover {
+  filter: drop-shadow(0 0 30px hsl(var(--primary) / 0.35));
+}
+
+.focus-mode-pulse {
+  animation: focusPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes focusPulse {
+  0%, 100% {
+    opacity: 1;
+    text-shadow: 
+      0 0 40px hsl(var(--timer-glow) / 0.2),
+      0 0 80px hsl(var(--timer-glow) / 0.1);
+  }
+  50% {
+    opacity: 0.95;
+    text-shadow: 
+      0 0 60px hsl(var(--timer-glow) / 0.4),
+      0 0 120px hsl(var(--timer-glow) / 0.2);
+  }
+}
+
+.focus-mode-button {
+  backdrop-filter: blur(12px);
+  border-color: hsl(var(--border) / 0.3);
+}
+
+.focus-mode-button:hover {
+  border-color: hsl(var(--primary) / 0.5);
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.2);
+}
+
+/* Focus mode keyboard hint styling */
+.focus-mode-overlay kbd {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+/* Dark mode adjustments for focus mode */
+.dark .focus-mode-gradient::before {
+  background: hsl(var(--primary) / 0.3);
+}
+
+.dark .focus-mode-gradient::after {
+  background: hsl(var(--accent) / 0.3);
+}
+
+.dark .focus-mode-ring {
+  filter: drop-shadow(0 0 30px hsl(var(--primary) / 0.35));
+}

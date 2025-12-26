@@ -1,28 +1,32 @@
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
-import { useTheme } from '@/hooks/useTheme';
+import { motion } from 'framer-motion';
 import { FileText } from 'lucide-react';
+import { BottomNavbar } from '@/components/layout/BottomNavbar';
+import { PageTransition, staggerContainer, staggerItem } from '@/components/layout/PageTransition';
 
 export default function TermsOfService() {
-  const { theme, setTheme } = useTheme();
-
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header theme={theme} onThemeChange={setTheme} />
+    <PageTransition>
+      <div className="min-h-screen flex flex-col pb-24 md:pb-28">
+        <div className="floating-gradient" />
 
-      <main className="flex-1">
-        <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <div className="mb-8 flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent">
-              <FileText className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-display font-bold">Terms of Service</h1>
-              <p className="text-muted-foreground mt-1">Last Updated: December 2, 2025</p>
-            </div>
-          </div>
+        <main className="flex-1">
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            className="container mx-auto px-4 py-12 max-w-4xl"
+          >
+            <motion.div variants={staggerItem} className="mb-8 flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent shadow-lg">
+                <FileText className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-display font-bold gradient-text">Terms of Service</h1>
+                <p className="text-muted-foreground mt-1">Last Updated: December 2, 2025</p>
+              </div>
+            </motion.div>
 
-          <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+            <motion.div variants={staggerItem} className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
             <section>
               <h2 className="text-2xl font-bold mb-4">1. Agreement to Terms</h2>
               <p className="text-muted-foreground leading-relaxed">
@@ -199,16 +203,17 @@ export default function TermsOfService() {
               </ul>
             </section>
 
-            <section className="bg-muted/50 p-6 rounded-lg border">
+            <section className="bg-muted/50 p-6 rounded-lg border backdrop-blur-sm">
               <p className="text-sm text-muted-foreground">
                 By using TimerFlow, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
               </p>
             </section>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </main>
 
-      <Footer />
+      <BottomNavbar />
     </div>
+  </PageTransition>
   );
 }

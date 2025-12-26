@@ -11,6 +11,7 @@ import { TimeInput } from '@/components/timer/TimeInput';
 import { PomodoroIndicator } from '@/components/timer/PomodoroIndicator';
 import { TimerReports } from '@/components/timer/TimerReports';
 import { AlertOverlay } from '@/components/AlertOverlay';
+import { FocusMode } from '@/components/timer/FocusMode';
 import { HowToUseSection } from '@/components/sections/HowToUseSection';
 import { BenefitsSection } from '@/components/sections/BenefitsSection';
 import { FAQSection } from '@/components/sections/FAQSection';
@@ -20,7 +21,7 @@ import { Clock, Timer, Watch } from 'lucide-react';
 
 const Index = () => {
   const { theme, setTheme } = useTheme();
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFocusMode, setIsFocusMode] = useState(false);
   const [showAlertOverlay, setShowAlertOverlay] = useState(false);
   const [sessionsVersion, setSessionsVersion] = useState(0);
   const [activeMode, setActiveMode] = useState<TimerMode>('countdown');
@@ -42,14 +43,8 @@ const Index = () => {
         ? stopwatchTimer
         : countdownTimer;
 
-  const toggleFullscreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    }
+  const toggleFocusMode = useCallback(() => {
+    setIsFocusMode(prev => !prev);
   }, []);
 
   const handleModeChange = (value: string) => {
@@ -68,6 +63,8 @@ const Index = () => {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't handle shortcuts when in focus mode (it has its own handlers)
+      if (isFocusMode) return;
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       
       // Esc dismisses alert overlay
@@ -95,14 +92,14 @@ const Index = () => {
           currentTimer.reset();
           break;
         case 'f':
-          toggleFullscreen();
+          toggleFocusMode();
           break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentTimer, toggleFullscreen, showAlertOverlay, handleDismissAlert]);
+  }, [currentTimer, toggleFocusMode, showAlertOverlay, handleDismissAlert, isFocusMode]);
 
   // Update document title with timer
   useEffect(() => {
@@ -172,7 +169,7 @@ const Index = () => {
                       onStart={countdownTimer.start}
                       onPause={countdownTimer.pause}
                       onReset={countdownTimer.reset}
-                      onFullscreen={toggleFullscreen}
+                      onFullscreen={toggleFocusMode}
                       disabled={countdownTimer.time === 0 && !countdownTimer.isRunning}
                     />
                     <div className="space-y-4">
@@ -197,7 +194,7 @@ const Index = () => {
                       onStart={pomodoroTimer.start}
                       onPause={pomodoroTimer.pause}
                       onReset={pomodoroTimer.reset}
-                      onFullscreen={toggleFullscreen}
+                      onFullscreen={toggleFocusMode}
                     />
                   </TabsContent>
 
@@ -213,7 +210,7 @@ const Index = () => {
                       onStart={stopwatchTimer.start}
                       onPause={stopwatchTimer.pause}
                       onReset={stopwatchTimer.reset}
-                      onFullscreen={toggleFullscreen}
+                      onFullscreen={toggleFocusMode}
                     />
                   </TabsContent>
                 </Tabs>
@@ -249,6 +246,20 @@ const Index = () => {
       <AlertOverlay 
         isVisible={showAlertOverlay} 
         onDismiss={handleDismissAlert}
+      />
+
+      {/* Focus Mode Overlay */}
+      <FocusMode
+        isOpen={isFocusMode}
+        onClose={() => setIsFocusMode(false)}
+        time={currentTimer.time}
+        isRunning={currentTimer.isRunning}
+        progress={currentTimer.progress}
+        onStart={currentTimer.start}
+        onPause={currentTimer.pause}
+        onReset={currentTimer.reset}
+        mode={activeMode}
+        pomodoroPhase={activeMode === 'pomodoro' ? pomodoroTimer.pomodoroPhase : undefined}
       />
     </div>
   );

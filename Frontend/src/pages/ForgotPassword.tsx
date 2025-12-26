@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { authService } from '@/services/auth.service';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Mail, AlertCircle, CheckCircle } from 'lucide-react';
+import { BottomNavbar } from '@/components/layout/BottomNavbar';
+import { PageTransition } from '@/components/layout/PageTransition';
+import { Loader2, Mail, AlertCircle, CheckCircle, Timer } from 'lucide-react';
 
 export function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -50,47 +53,87 @@ export function ForgotPassword() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background to-muted">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <div className="flex justify-center mb-4">
-              <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
-              </div>
-            </div>
-            <CardTitle className="text-2xl font-bold text-center">Check Your Email</CardTitle>
-            <CardDescription className="text-center">
-              We've sent password reset instructions to <strong>{email}</strong>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground text-center">
-              Click the link in the email to reset your password. If you don't see the email,
-              check your spam folder.
-            </p>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
-            <Button variant="outline" className="w-full" onClick={() => setSuccess(false)}>
-              Try Another Email
-            </Button>
-            <Link to="/login" className="text-sm text-center text-primary hover:underline">
-              Back to Sign In
-            </Link>
-          </CardFooter>
-        </Card>
-      </div>
+      <PageTransition>
+        <div className="min-h-screen flex flex-col pb-24 md:pb-28">
+          <div className="floating-gradient" />
+          
+          <div className="flex-1 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="w-full max-w-md"
+            >
+              <Card className="backdrop-blur-xl bg-card/80 border-border/50">
+                <CardHeader className="space-y-1">
+                  <div className="flex justify-center mb-4">
+                    <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                      <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+                    </div>
+                  </div>
+                  <CardTitle className="text-2xl font-bold text-center">Check Your Email</CardTitle>
+                  <CardDescription className="text-center">
+                    We've sent password reset instructions to <strong>{email}</strong>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground text-center">
+                    Click the link in the email to reset your password. If you don't see the email,
+                    check your spam folder.
+                  </p>
+                </CardContent>
+                <CardFooter className="flex flex-col space-y-2">
+                  <Button variant="outline" className="w-full" onClick={() => setSuccess(false)}>
+                    Try Another Email
+                  </Button>
+                  <Link to="/login" className="text-sm text-center text-primary hover:underline">
+                    Back to Sign In
+                  </Link>
+                </CardFooter>
+              </Card>
+            </motion.div>
+          </div>
+          
+          <BottomNavbar />
+        </div>
+      </PageTransition>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background to-muted">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
-          <CardDescription className="text-center">
-            Enter your email and we'll send you a link to reset your password
-          </CardDescription>
-        </CardHeader>
+    <PageTransition>
+      <div className="min-h-screen flex flex-col pb-24 md:pb-28">
+        <div className="floating-gradient" />
+        
+        <div className="flex-1 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-md"
+          >
+            {/* Logo */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex justify-center mb-8"
+            >
+              <Link to="/" className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-accent shadow-lg">
+                  <Timer className="h-6 w-6 text-primary-foreground" />
+                </div>
+                <span className="font-display text-2xl font-bold gradient-text">TimerFlow</span>
+              </Link>
+            </motion.div>
+
+            <Card className="backdrop-blur-xl bg-card/80 border-border/50">
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
+                <CardDescription className="text-center">
+                  Enter your email and we'll send you a link to reset your password
+                </CardDescription>
+              </CardHeader>
         <CardContent className="space-y-4">
           {error && (
             <Alert variant="destructive">
@@ -145,6 +188,11 @@ export function ForgotPassword() {
           </Link>
         </CardFooter>
       </Card>
-    </div>
+          </motion.div>
+        </div>
+        
+        <BottomNavbar />
+      </div>
+    </PageTransition>
   );
 }
