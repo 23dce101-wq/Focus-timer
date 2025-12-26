@@ -189,6 +189,17 @@ export async function loadHabits(): Promise<Habit[]> {
     });
 
     if (!response.ok) {
+      // If the user is no longer authorized, send them back to login
+      if (response.status === 401) {
+        console.warn('Habits request returned 401 – redirecting to login');
+        try {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+        } catch (e) {
+          console.error('Failed to clear auth tokens after 401 on habits:', e);
+        }
+        window.location.href = '/login';
+      }
       console.error('Failed to load habits from server:', await response.text());
       return [];
     }
@@ -233,6 +244,16 @@ export async function saveHabits(habits: Habit[]): Promise<void> {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        console.warn('Save habits request returned 401 – redirecting to login');
+        try {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+        } catch (e) {
+          console.error('Failed to clear auth tokens after 401 on saveHabits:', e);
+        }
+        window.location.href = '/login';
+      }
       console.error('Failed to save habits to server:', await response.text());
     }
   } catch (error) {
