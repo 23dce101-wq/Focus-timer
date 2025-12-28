@@ -45,21 +45,18 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // CORS configuration
-// Allow localhost by default for development and dynamically allow
-// deployed frontends via FRONTEND_URL or FRONTEND_URLS.
-const defaultAllowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:8080',
+// Use a strict, explicit allow-list of frontend origins.
+// Do NOT derive this from environment variables to avoid
+// accidental overexposure in production.
+const allowedOrigins = [
+  'https://timer-flow.vercel.app', // Production frontend (Vercel)
+  'http://localhost:5173',        // Vite dev server
+  'http://localhost:8080',        // Optional local fallback/dev server
 ];
 
-const envOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
-  .split(',')
-  .map((o) => o.trim())
-  .filter(Boolean);
-
-const allowedOrigins = Array.from(new Set([...defaultAllowedOrigins, ...envOrigins]));
-
-// Dynamic CORS middleware allowing credentials
+// Dynamic CORS middleware allowing credentials (cookies, auth headers).
+// This is required so that Google OAuth and session cookies work
+// correctly between the frontend and this API.
 app.use(
   cors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
@@ -74,7 +71,9 @@ app.use(
   })
 );
 
-// Ensure preflight OPTIONS returns success
+// Ensure preflight OPTIONS requests succeed for all allowed origins.
+// This mirrors the same allow-list above and is important for browsers
+// to accept cross-origin requests from the configured frontends.
 app.options(
   '*',
   cors({
