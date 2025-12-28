@@ -81,7 +81,7 @@ Deployment
 This project is deployed on Vercel. It automatically builds from GitHub pushes.
 
 You can check the live deployment here:
-https://focus-timer-flame.vercel.app/
+https://timer-flow.vercel.app/
 
 
 
