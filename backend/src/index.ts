@@ -18,30 +18,38 @@ const app: Application = express();
 const PORT = Number(process.env.PORT) || 4000;
 
 // Security middleware
-// Configure Helmet so that COOP/COEP do not break OAuth popups,
-// workers, or postMessage-based features in development or production.
-// We explicitly disable crossOriginEmbedderPolicy and relax
-// crossOriginOpenerPolicy to allow popups while keeping a sane default.
-const isProduction = process.env.NODE_ENV === 'production';
-
+// Configure Helmet without enforcing COOP/COEP so that we can
+// explicitly control those headers for Google OAuth popups below.
 app.use(
   helmet({
-    // Disable COEP so that third-party scripts, workers, and iframes
-    // (e.g. Google OAuth, analytics, canvas workers) are not blocked.
+    // Disable COEP via Helmet so that it does not interfere with
+    // cross-origin resources; we set an explicit header separately.
     crossOriginEmbedderPolicy: false,
-    // Allow opening cross-origin windows (OAuth flows, etc.) while
-    // still using a safe default policy in production.
-    crossOriginOpenerPolicy: isProduction
-      ? { policy: 'same-origin-allow-popups' }
-      : { policy: 'unsafe-none' },
+    // Disable Helmet's COOP handling; we will set
+    // Cross-Origin-Opener-Policy manually to the required value.
+    crossOriginOpenerPolicy: false,
   })
 );
+
+// Explicit COOP/COEP headers for Google OAuth popups and redirects.
+// These must be applied before all routes so that any auth endpoints
+// (e.g. /api/auth/google) inherit them.
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // Allow this origin to open popups (Google OAuth window) without
+  // being isolated in a separate browsing context.
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  // Keep COEP disabled so that third-party scripts/iframes used by
+  // Google Identity Services continue to work.
+  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  next();
+});
+
 // CORS configuration
-// Allow localhost by default and optionally one or more frontend URLs from env
+// Allow localhost by default for development and dynamically allow
+// deployed frontends via FRONTEND_URL or FRONTEND_URLS.
 const defaultAllowedOrigins = [
   'http://localhost:5173',
   'http://localhost:8080',
-  'https://focus-timer-flame.vercel.app',
 ];
 
 const envOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
