@@ -3,7 +3,7 @@
 A full-stack web application for tracking habits and improving productivity.  
 You can use it to manage tasks, build productive routines, and monitor your daily focus metrics.
 
-Live Demo: https://focus-timer-flame.vercel.app/
+Live Demo: https://timer-flow.vercel.app/
 
 ---
 
